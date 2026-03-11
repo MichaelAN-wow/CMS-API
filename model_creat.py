@@ -20,6 +20,13 @@ from insightface.app import FaceAnalysis
 
 app = FastAPI()
 
+
+@app.get("/health")
+def health():
+    """Railway (and other platforms) use this to confirm the service is up."""
+    return {"status": "ok"}
+
+
 # Include 'detection' to get the bbox, and 'recognition' for the embedding
 providers = {'providers': ['CPUExecutionProvider']}
 allow_names = ['detection', 'recognition']

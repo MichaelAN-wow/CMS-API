@@ -10,3 +10,6 @@ dockerfilePath = "Dockerfile"
 # if your Dockerfile CMD uses PORT from the environment (it does).
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 3
+# Health check: must return 200. App may be slow to start (InsightFace loads models).
+healthcheckPath = "/health"
+healthcheckTimeout = 600
