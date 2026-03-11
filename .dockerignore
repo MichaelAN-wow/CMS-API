@@ -1,0 +1,22 @@
+# Virtual env and caches
+venv
+.venv
+__pycache__
+*.pyc
+.pytest_cache
+.mypy_cache
+
+# Git and IDE
+.git
+.gitignore
+.cursor
+.vscode
+*.md
+
+# Local / env (don't bake secrets into image)
+.env
+.env.local
+*.local
+
+# Railway config is for deploy settings only; not needed inside image
+# railway.toml is optional to exclude if you prefer

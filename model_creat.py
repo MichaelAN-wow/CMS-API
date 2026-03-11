@@ -1,3 +1,4 @@
+import os
 import cv2
 import numpy as np
 import sys
@@ -11,9 +12,10 @@ from pydantic import BaseModel
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 
-# Note: Using sys.path.append for venv can cause issues if moved to another environment,
-# but keeping it here as requested.
-sys.path.append('venv\Lib\site-packages')
+# Optional: add local venv to path when present (e.g. on Windows dev); skip in Docker/CI
+_venv_site = os.path.join('venv', 'Lib', 'site-packages')
+if os.path.isdir(_venv_site):
+    sys.path.append(_venv_site)
 from insightface.app import FaceAnalysis
 
 app = FastAPI()
