@@ -27,11 +27,19 @@ def health():
     return {"status": "ok"}
 
 
-# Include 'detection' to get the bbox, and 'recognition' for the embedding
-providers = {'providers': ['CPUExecutionProvider']}
-allow_names = ['detection', 'recognition']
-face_app = FaceAnalysis(name="buffalo_l", root='./', allowed_modules=allow_names, **providers)
-face_app.prepare(ctx_id=0, det_size=(640, 640))  # 640x640 is the standard size for InsightFace
+# Lazy-load InsightFace so the server can start fast and pass health checks (e.g. on Railway).
+# Model loads on first request to /api/upload_source.
+_face_app = None
+
+
+def get_face_app():
+    global _face_app
+    if _face_app is None:
+        providers = {'providers': ['CPUExecutionProvider']}
+        allow_names = ['detection', 'recognition']
+        _face_app = FaceAnalysis(name="buffalo_l", root='./', allowed_modules=allow_names, **providers)
+        _face_app.prepare(ctx_id=0, det_size=(640, 640))
+    return _face_app
 
 
 def handle_exception(loop, context):
@@ -126,7 +134,14 @@ async def upload_source(request: ImageRequest):
         if source_img is None:
             raise HTTPException(status_code=400, detail="Invalid image format or corrupted base64 data")
 
-        # Detect face in source image
+        # Detect face in source image (lazy-loads InsightFace on first call)
+        try:
+            face_app = get_face_app()
+        except Exception as e:
+            raise HTTPException(
+                status_code=503,
+                detail=f"Face model failed to load: {str(e)}. Check server memory and logs.",
+            )
         source_faces = face_app.get(source_img)
 
         if len(source_faces) == 0:
