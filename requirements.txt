@@ -1,6 +1,10 @@
-# Web framework
+# --- All third-party libs used in model_creat.py ---
+# Stdlib (no install): os, sys, base64, socket, warnings, logging, asyncio
+
+# Web framework (FastAPI, uvicorn)
 fastapi>=0.104.0
 uvicorn[standard]>=0.24.0
+python-multipart>=0.0.6
 
 # Validation (often bundled with FastAPI)
 pydantic>=2.0.0
