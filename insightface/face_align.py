@@ -1,6 +1,8 @@
 import cv2
 import numpy as np
 from skimage import transform as trans
+import insightface.utils.face_align
+print(insightface.utils.face_align.__file__)
 
 arcface_dst = np.array(
     [[38.2946, 51.6963], [73.5318, 51.5014], [56.0252, 71.7366],
