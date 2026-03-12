@@ -17,3 +17,6 @@ onnxruntime
 
 # Time sync (NTP)
 ntplib
+
+# Google Drive download (for ONNX models)
+gdown

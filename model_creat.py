@@ -11,6 +11,7 @@ import asyncio
 from pydantic import BaseModel
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
+import gdown
 
 # Suppress InsightFace/skimage FutureWarning (estimate deprecated) so deploy doesn't fail
 warnings.filterwarnings('ignore', category=FutureWarning, message=r'.*`estimate` is deprecated.*')
@@ -22,6 +23,42 @@ if os.path.isdir(_venv_site):
 from insightface.app import FaceAnalysis
 
 app = FastAPI()
+
+# Google Drive file IDs for buffalo_l ONNX models
+# From: https://drive.google.com/drive/folders/19HV4qEuJ06LiH1FvqnqWbE-ygZUreQXL
+BUFFALO_L_MODELS = {
+    "1k3d68.onnx": "1mN4dhRrD5JWqeEx0GHGyNABWziWY_v5N",
+    "2d106det.onnx": "16hp7iWIFvwHfxqnshzdt0DD8uEYqxuRJ",
+    "det_10g.onnx": "1Aa_sRLtg7XxZ7UCJQQTtxw66WxV4aJnZ",
+    "w600k_r50.onnx": "11Jrda2lA-4A2kk7lYGOfQZvQLy1gO-Vp",
+}
+MODEL_DIR = "models/buffalo_l"
+
+
+def _is_placeholder_id(fid: str) -> bool:
+    """True if fid is still a placeholder (not a real Google Drive file ID)."""
+    if not fid or len(fid) < 20:
+        return True
+    if fid.startswith("FILE_ID") or "PASTE" in fid.upper():
+        return True
+    return False
+
+
+def ensure_models_downloaded():
+    """Download buffalo_l ONNX models from Google Drive if missing. Replace FILE_ID_* in BUFFALO_L_MODELS with your IDs."""
+    os.makedirs(MODEL_DIR, exist_ok=True)
+    for name, fid in BUFFALO_L_MODELS.items():
+        path = os.path.join(MODEL_DIR, name)
+        if os.path.exists(path):
+            continue
+        if _is_placeholder_id(fid):
+            logging.warning("Model %s not found and Drive ID is placeholder; set BUFFALO_L_MODELS[%r] to your file ID.", name, name)
+            continue
+        url = f"https://drive.google.com/uc?id={fid}"
+        try:
+            gdown.download(url, path, quiet=False)
+        except Exception as e:
+            logging.warning("Failed to download %s from Drive: %s", name, e)
 
 
 @app.get("/health")
@@ -38,6 +75,7 @@ _face_app = None
 def get_face_app():
     global _face_app
     if _face_app is None:
+        ensure_models_downloaded()
         providers = {'providers': ['CPUExecutionProvider']}
         allow_names = ['detection', 'recognition']
         _face_app = FaceAnalysis(name="buffalo_l", root='./', allowed_modules=allow_names, **providers)
