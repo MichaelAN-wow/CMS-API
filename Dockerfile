@@ -1,10 +1,12 @@
 # Use Python 3.11 slim for smaller image (InsightFace works on CPU)
 FROM python:3.11-slim
 
-# Install system deps often needed by OpenCV/InsightFace
+# Install system deps: runtime libs for OpenCV/InsightFace + build tools for insightface (Cython/C++)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libgl1 \
     libglib2.0-0 \
+    build-essential \
+    python3-dev \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
