@@ -2,18 +2,18 @@
 # Stdlib (no install): os, sys, base64, socket, warnings, logging, asyncio
 
 # Web framework (FastAPI, uvicorn)
-fastapi>=0.104.0
-uvicorn[standard]>=0.24.0
-python-multipart>=0.0.6
+fastapi
+uvicorn
+python-multipart
 
 # Validation (often bundled with FastAPI)
-pydantic>=2.0.0
+pydantic
 
 # Image / ML
-numpy>=1.24.0
-opencv-python-headless>=4.8.0
-insightface>=0.7.0
-onnxruntime>=1.15.0
+numpy
+opencv-python-headless
+insightface
+onnxruntime
 
 # Time sync (NTP)
-ntplib>=0.4.0
+ntplib
