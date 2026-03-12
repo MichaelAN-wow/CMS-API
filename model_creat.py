@@ -12,6 +12,9 @@ from pydantic import BaseModel
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 
+# Suppress InsightFace/skimage FutureWarning (estimate deprecated) so deploy doesn't fail
+warnings.filterwarnings('ignore', category=FutureWarning, message=r'.*`estimate` is deprecated.*')
+
 # Optional: add local venv to path when present (e.g. on Windows dev); skip in Docker/CI
 _venv_site = os.path.join('venv', 'Lib', 'site-packages')
 if os.path.isdir(_venv_site):
