@@ -33,6 +33,7 @@ BUFFALO_L_MODELS = {
     "w600k_r50.onnx": "11Jrda2lA-4A2kk7lYGOfQZvQLy1gO-Vp",
 }
 MODEL_DIR = "models/buffalo_l"
+_models_download_done = False  # Run download check only once per process
 
 
 def _is_placeholder_id(fid: str) -> bool:
@@ -45,7 +46,11 @@ def _is_placeholder_id(fid: str) -> bool:
 
 
 def ensure_models_downloaded():
-    """Download buffalo_l ONNX models from Google Drive if missing. Replace FILE_ID_* in BUFFALO_L_MODELS with your IDs."""
+    """Download buffalo_l ONNX models from Google Drive if missing. Runs only once per process."""
+    global _models_download_done
+    if _models_download_done:
+        return
+    _models_download_done = True
     os.makedirs(MODEL_DIR, exist_ok=True)
     for name, fid in BUFFALO_L_MODELS.items():
         path = os.path.join(MODEL_DIR, name)
